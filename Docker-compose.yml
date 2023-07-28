@@ -1,0 +1,45 @@
+FROM php:7.4-apache
+
+# Enable mod_rewrite
+RUN a2enmod rewrite
+
+# Update packages
+RUN apt-get update && apt-get upgrade -y
+
+# Install necessary packages
+RUN apt-get install -y \
+    git \
+    unzip \
+    libzip-dev \
+    libicu-dev \
+    libonig-dev \
+    libpng-dev \
+    libjpeg-dev
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql zip mbstring intl exif pcntl bcmath gd
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Set the working directory
+WORKDIR /var/www/html
+arquivo .env assim:DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=employees
+DB_USERNAME=root
+DB_PASSWORD=root
+A tabela criada no banco de dados em:CREATE TABLE employees (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    birthdate DATE NOT NULL,
+    cpf VARCHAR(14) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    marital_status ENUM('single', 'married', 'divorced', 'widowed') NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY cpf (cpf),
+    UNIQUE KEY email (email)
+);

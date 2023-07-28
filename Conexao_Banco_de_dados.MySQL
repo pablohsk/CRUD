@@ -1,0 +1,53 @@
+<?php
+
+// Arquivo de configuração do banco de dados
+$servername = "db";
+$username = "root";
+$password = "root";
+$dbname = "employees";
+
+// Conexão com o banco de dados
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+
+// Verifica se houve erro na conexão
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+Adicionar um funcionário em:
+<?php
+
+// Validar campos
+if (empty($_POST['name']) || empty($_POST['birthdate']) || empty($_POST['cpf']) || empty($_POST['email']) || empty($_POST['marital_status'])) {
+    echo "Todos os campos são obrigatórios.";
+    exit;
+}
+
+$name = $_POST['name'];
+$birthdate = $_POST['birthdate'];
+$cpf = $_POST['cpf'];
+$email = $_POST['email'];
+$marital_status = $_POST['marital_status'];
+
+// Validar CPF
+if (!validaCPF($cpf)) {
+    echo "CPF inválido.";
+    exit;
+}
+
+// Validar e-mail
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo "E-mail inválido.";
+    exit;
+}
+
+// Inserir no banco de dados
+$sql = "INSERT INTO employees (name, birthdate, cpf, email, marital_status) VALUES ('$name', '$birthdate', '$cpf', '$email', '$marital_status')";
+
+if (mysqli_query($conn, $sql)) {
+    echo "Funcionário adicionado com sucesso.";
+} else {
+    echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+}
+
+// Fechar conexão com o banco de dados
+mysqli_close($conn);
